@@ -8,12 +8,13 @@ import java.util.regex.Pattern;
 
 public class Main {
     public static void main(String[] args) {
-        List<URL> pdfs = urlExtractor("http://cs.lth.se/eda095/foerelaesningar/?no_cache=1/");
+        List<URL> pdfs = urlExtractor("http://cs229.stanford.edu/materials.html");
         try {
             saveUrls(pdfs);
         } catch (IOException e) {
             e.printStackTrace();
         }
+
     }
 
     public static void saveUrls(List<URL> urls) throws IOException {
@@ -68,15 +69,17 @@ public class Main {
             while ((line = br.readLine()) != null) {
                 sb.append(line + "\n");
             }
-            String patternHrefPdf = "<a\\s+\\n*\\s*href\\s*=\\s*\"(http://.*?.pdf)\"";
+            String patternHrefPdf = "<a\\s+\\n*\\s*href\\s*=\\s*\"([^>]*?.pdf)\"";
 
             Pattern pdfLinks = Pattern.compile(patternHrefPdf);
             Matcher m = pdfLinks.matcher(sb.toString());
+            //System.out.println(sb.toString());
 
             while (m.find()) {
                 String thePdfUrl = m.group(1);
-                urls.add(new URL(thePdfUrl));
-                System.out.println(thePdfUrl);
+                URL urlPdf = new URL(url, thePdfUrl);
+                urls.add(new URL(url, thePdfUrl));
+                System.out.println(urlPdf.toString());
             }
         } catch (MalformedURLException mue) {
             mue.printStackTrace();
