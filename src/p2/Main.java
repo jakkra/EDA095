@@ -1,3 +1,6 @@
+package p2;
+
+
 import java.io.*;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -9,48 +12,17 @@ import java.util.regex.Pattern;
 public class Main {
     public static void main(String[] args) {
         List<URL> pdfs = urlExtractor("http://cs229.stanford.edu/materials.html");
-        try {
-            saveUrls(pdfs);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-    }
-
-    public static void saveUrls(List<URL> urls) throws IOException {
         System.out.println("Saving pdfs...");
         File dir = new File("downloads/");
         dir.mkdirs();
 
-        for (URL url : urls) {
-            File tmp = new File(dir, url.getFile().substring(url.getFile().lastIndexOf('/') + 1));
-            tmp.createNewFile();
-
-            BufferedInputStream in = null;
-            FileOutputStream fOut = null;
-            try {
-                in = new BufferedInputStream(url.openStream());
-                fOut = new FileOutputStream(tmp);
-
-                final byte data[] = new byte[2048];
-                int count;
-                while ((count = in.read(data, 0, 2048)) != -1) {
-                    fOut.write(data, 0, count);
-                }
-            } catch(FileNotFoundException e){
-
-            } finally {
-                if (in != null) {
-                    in.close();
-                }
-                if (fOut != null) {
-                    fOut.close();
-                }
-            }
+        //Start threads
+        for (int i = 0; i < 10; i++) {
+            Runner downloader = new Runner(pdfs);
+            downloader.start();
         }
-        System.out.println("Finished saving pdfs...");
-
     }
+
 
     public static List<URL> urlExtractor(String urlToPage) {
         URL url;
@@ -58,7 +30,6 @@ public class Main {
         BufferedReader br;
         String line;
         ArrayList<URL> urls = new ArrayList<URL>();
-
 
         try {
             url = new URL(urlToPage);
